@@ -100,7 +100,7 @@ def sort_members_by_distance(rick_position, members_positions):
 
 
 # Desenha o mapa
-def draw_map(mapa, path, current_position, members_positions, message, total_cost, final_message):
+def draw_map(mapa, path, current_position, members_positions, message, total_cost, final_message, cost_so_far):
     for y, row in enumerate(mapa):
         for x, cell in enumerate(row):
             color = WHITE
@@ -131,6 +131,9 @@ def draw_map(mapa, path, current_position, members_positions, message, total_cos
      # Adiciona texto na tela
     text = font.render(f'Posição atual: {current_position}', True, WHITE)
     screen.blit(text, (10, height - 20))  # Posiciona o texto no canto inferior
+
+    #text = font.render(f'Custo atual: {cost_so_far[current_position]}', True, WHITE)
+    #screen.blit(text, (280, height - 20))  # Posiciona o texto no canto inferior
 
      # Adiciona o texto da mensagem
     if message:
@@ -178,6 +181,7 @@ def setMembers():
 def main():
     mapa = setMap()
 
+    print("Preencha os dados com atenção! Lembre-se de não colocar personagens em posições indevidas, como edifícios!")
     coord_x = input("Insira as coordenadas da posição inicial de Rick (x,y):\nX: ")
     coord_y = input("Y: ")
     start = (int(coord_x), int(coord_y)) # inicio do exemplo: (21, 13)
@@ -244,8 +248,8 @@ def main():
                         message = f"Chegou no membro {member.getName()}"
                         members_positions.remove(member)
                         break
-            else:
-                message = None
+            #else:
+                #message = None
 
             if current_position == end:
                 final_message = "Fim do caminho!"
@@ -257,7 +261,7 @@ def main():
             pygame.time.wait(2000) 
 
         screen.fill(WHITE)
-        draw_map(mapa, total_path[:path_index], current_position, members_positions, message, total_cost, final_message)
+        draw_map(mapa, total_path[:path_index], current_position, members_positions, message, total_cost, final_message, cost_so_far)
         
         pygame.display.flip()
         time.sleep(0.1)
