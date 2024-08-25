@@ -80,6 +80,35 @@ def a_star_search(start, goal, mapa):
 
     return path, cost
 
+# Calculando o custo acumulado
+def calculate_accumulated_cost(path, mapa):
+    accumulated_cost = {path[0]: 0} # inicia com custo zero
+    accumulated_list = []
+    accumulated_cost_items_repeated = 0
+    temp = 0
+    before = path[0]
+
+
+    for item in path: # itera sobre cada nó na lista de caminho até o fim
+        position = mapa[item[0]][item[1]]
+        # print(f'Position: {item[0]}, {item[1]} {position}')
+        new_cost = accumulated_cost[before] + terrain_cost[position] # calcula custo do caminho de cada nó
+        accumulated_cost_items_repeated += terrain_cost[position]
+        temp += terrain_cost[position]
+        accumulated_list.append(temp)
+        if item not in accumulated_cost: # checa se o nó já não está na lista de custos
+            new_cost += accumulated_cost_items_repeated
+            accumulated_cost_items_repeated = 0
+            # print(f'Accumulated cost: {accumulated_cost[before]}')
+            # print(f'Terrain cost: {terrain_cost[position]}')
+            accumulated_cost[item] = new_cost # adiciona o custo acumulado
+
+
+        before = item
+
+    # print(accumulated_list)
+    return accumulated_cost, accumulated_list
+
 # Função para reconstruir o caminho
 def reconstruct_path(came_from, start, goal):
     current = goal # o fim vira o início
@@ -100,7 +129,7 @@ def sort_members_by_distance(rick_position, members_positions):
 
 
 # Desenha o mapa
-def draw_map(mapa, path, current_position, members_positions, message, total_cost, final_message, cost_so_far):
+def draw_map(mapa, path, current_position, members_positions, message, total_cost, final_message, index, accumulated_list):
     for y, row in enumerate(mapa):
         for x, cell in enumerate(row):
             color = WHITE
@@ -132,9 +161,6 @@ def draw_map(mapa, path, current_position, members_positions, message, total_cos
     text = font.render(f'Posição atual: {current_position}', True, WHITE)
     screen.blit(text, (10, height - 20))  # Posiciona o texto no canto inferior
 
-    #text = font.render(f'Custo atual: {cost_so_far[current_position]}', True, WHITE)
-    #screen.blit(text, (280, height - 20))  # Posiciona o texto no canto inferior
-
      # Adiciona o texto da mensagem
     if message:
         text = font.render(message, True, WHITE)
@@ -143,6 +169,9 @@ def draw_map(mapa, path, current_position, members_positions, message, total_cos
     # Adiciona o texto do custo total
     if total_cost is not None:
         cost_text = font.render(f'Custo total: {total_cost}', True, BLACK)
+        screen.blit(cost_text, (width * 0.7, height - 40))  # Posiciona o texto no canto inferior
+    else:
+        cost_text = font.render(f'Custo atual: {accumulated_list[index]}', True, BLACK)
         screen.blit(cost_text, (width * 0.7, height - 40))  # Posiciona o texto no canto inferior
 
     # Adiciona a mensagem final
@@ -219,6 +248,7 @@ def main():
     came_from, cost_so_far = a_star_search(current_start, end, mapa)
     path = reconstruct_path(came_from, current_start, end)
     total_path.extend(path[1:])
+    accumulated_cost, accumulated_list = calculate_accumulated_cost(total_path, mapa)
 
    # Inicializa o Pygame
     running = True
@@ -253,22 +283,23 @@ def main():
 
             if current_position == end:
                 final_message = "Fim do caminho!"
-                total_cost = cost_so_far[end]  # Atualiza o custo total ao final
+                total_cost = accumulated_list[-1]  # Atualiza o custo total ao final
                 path_index = len(total_path)  # Para o loop
         else:
             final_message = "Fim do caminho!"
-            total_cost = cost_so_far[end]  # Atualiza o custo total ao final
+            total_cost = accumulated_list[-1]  # Atualiza o custo total ao final
             pygame.time.wait(2000) 
 
         screen.fill(WHITE)
-        draw_map(mapa, total_path[:path_index], current_position, members_positions, message, total_cost, final_message, cost_so_far)
+        draw_map(mapa, total_path[:path_index], current_position, members_positions, message, total_cost, final_message, path_index, accumulated_list)
         
         pygame.display.flip()
         time.sleep(0.1)
     
     pygame.quit()
 
-    print(f"Custo total: {total_cost}")
+    print(f"Custo total: {accumulated_list[-1]}")
+
 
 if __name__ == '__main__':
     main()
