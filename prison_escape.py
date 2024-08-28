@@ -213,7 +213,7 @@ def main():
     print("Preencha os dados com atenção! Lembre-se de não colocar personagens em posições indevidas, como edifícios!")
     coord_x = input("Insira as coordenadas da posição inicial de Rick (x,y):\nX: ")
     coord_y = input("Y: ")
-    start = (int(coord_x), int(coord_y)) # inicio do exemplo: (21, 13)
+    start = (int(coord_x), int(coord_y)) # inicio do exemplo: (20, 13)
 
     coord_x = input("Insira as coordenadas da posição final:\nX: ")
     coord_y = input("Y: ")
@@ -227,10 +227,9 @@ def main():
         Member("Carl", (6, 32)),
         Member("Daryl", (13, 31)),
         Member("Glen", (35, 35)),
-        Member("Maggie", (32, 9))
+        Member("Maggie", (32, 8))
     ]
     survivors = sort_members_by_distance(start, members)
-    
     total_path = []
     current_start = start
     members_positions = []
