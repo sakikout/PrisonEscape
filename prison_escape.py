@@ -180,7 +180,7 @@ def draw_map(mapa, path, current_position, members_positions, message, total_cos
         screen.blit(final_text,  (280, height - 20))  # Posiciona o texto acima da mensagem de custo
 
 
-def setMap():
+def set_map():
     map_name = input("Insira o nome do mapa em txt: ")
 
     if ".txt" not in map_name:
@@ -189,7 +189,7 @@ def setMap():
     mapa = read_map(map_name)
     return mapa
 
-def setMembers():
+def set_members():
     members = []  # nomes: Carl, Daryl, Glen e Maggie - pos: [(6, 32), (13, 31), (35, 35), (32, 9)]
 
     num_members = input("Insira o número total de membros para Rick encontrar: ")
@@ -207,9 +207,9 @@ def setMembers():
 
     return members
 
-def main():
-    mapa = setMap()
-
+# Função para definir o início e fim da busca.
+# Como foi definido sempre iniciar no Refeitório e terminar na saída da prisão, não será utilizado.
+def set_starting_points():
     print("Preencha os dados com atenção! Lembre-se de não colocar personagens em posições indevidas, como edifícios!")
     coord_x = input("Insira as coordenadas da posição inicial de Rick (x,y):\nX: ")
     coord_y = input("Y: ")
@@ -219,22 +219,29 @@ def main():
     coord_y = input("Y: ")
     end = (int(coord_x), int(coord_y))  # saída do exemplo: (41, 20)
 
+    return start, end
+
+def main():
+    mapa = set_map() # Define o nome do mapa a ser lido
+    start = (20, 13) # Início no refeitório
+    end = (41, 20) # Saída da prisão
+
     settings = input("Deseja inserir todos os membros ou escolher o padrão?\n1 - INSERIR MEMBROS\n2 - MEMBROS PADRÃO\nR: ")
     if (int(settings) == 1 or settings.upper() == "SIM"):
-        members = setMembers() # nomes: Carl, Daryl, Glen e Maggie - pos: [(6, 32), (13, 31), (35, 35), (32, 9)]
-    else:
+        members = set_members() # Define os membros escolhidos pelo usuário
+    else: # Membros do exemplo
         members = [
         Member("Carl", (6, 32)),
         Member("Daryl", (13, 31)),
         Member("Glen", (35, 35)),
         Member("Maggie", (32, 8))
     ]
-    survivors = sort_members_by_distance(start, members)
+    survivors = sort_members_by_distance(start, members) # Organiza a lista para definir qual membro está mais perto de Rick
     total_path = []
     current_start = start
     members_positions = []
 
-    while len(survivors) != 0:
+    while len(survivors) != 0: # Inicia a busca para cada membro
         survivor = survivors.pop(0)
         came_from, cost_so_far = a_star_search(current_start, survivor.getCoordinates(), mapa)
         path = reconstruct_path(came_from, current_start, survivor.getCoordinates())
